@@ -1,0 +1,50 @@
+.grid {
+  height: 50vmin;
+  width: 50vmin;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-gap: 1rem;
+}
+
+.tile {
+  border-radius: 0.5rem;
+  background: white;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.tile[data-player="x"]:before,
+.tile[data-player="x"]:after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 0.2rem;
+  background: red;
+  left: calc(50% - 0.1rem);
+  top: 0;
+}
+
+.tile[data-player="x"]:before {
+  transform: rotate(-45deg);
+}
+.tile[data-player="x"]:after {
+  transform: rotate(45deg);
+}
+
+.tile[data-player="o"]:before {
+  content: "";
+  height: 80%;
+  width: 80%;
+  left: 10%;
+  top: 10%;
+  position: absolute;
+  border-radius: 50%;
+  border: 0.2rem solid blue;
+}
+
+.game h2 {
+  font-family: Proxima Nova, sans-serif;
+  font-weight: bold;
+  font-size: 2rem;
+}

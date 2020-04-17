@@ -1,0 +1,29 @@
+{
+  "name": "tic-tac-toe-crank-xstate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel index.html --open",
+    "build": "parcel build index.html"
+  },
+  "eslint": {
+    "settings": {
+      "react": {
+        "pragma": "createElement"
+      }
+    }
+  },
+  "dependencies": {
+    "@bikeshaving/crank": "0.1.0-beta.8",
+    "xstate": "4.9.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-0",
+    "@babel/preset-react": "^7.9.4",
+    "parcel-bundler": "^1.6.1",
+    "postcss-modules": "^2.0.0",
+    "typescript": "^3.8.3"
+  },
+  "keywords": []
+}
