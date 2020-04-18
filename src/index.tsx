@@ -34,7 +34,6 @@ function getTitle(
   send: EventReturn<TicTacToeEvent>
 ) {
   const handleReset = () => {
-    console.log('reset');
     send({ type: RESET, input: undefined });
   };
 
