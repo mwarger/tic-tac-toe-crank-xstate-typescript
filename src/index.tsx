@@ -6,6 +6,8 @@ import {
   TicTacToeEvent,
   TicTacToeContext,
   TicTacToeState,
+  PLAY,
+  RESET,
 } from './machine';
 import { State } from 'xstate';
 
@@ -31,7 +33,11 @@ function getTitle(
   currentState: State<TicTacToeContext, TicTacToeEvent, any, TicTacToeState>,
   send: EventReturn<TicTacToeEvent>
 ) {
-  const handleReset = () => send({ type: 'RESET' });
+  const handleReset = () => {
+    console.log('reset');
+    send({ type: RESET, input: undefined });
+  };
+
   if (currentState.matches('playing')) {
     return (
       <h2>Player {currentState.context.player.toString().toUpperCase()}</h2>
@@ -80,7 +86,7 @@ async function* TicTacToe() {
             <Tile
               onClick={() => {
                 send({
-                  type: 'PLAY',
+                  type: PLAY,
                   input: { player: state.context.player, value: i },
                 });
               }}

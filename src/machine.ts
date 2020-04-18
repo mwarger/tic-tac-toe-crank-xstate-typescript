@@ -13,8 +13,8 @@ export interface TicTacToeContext {
   player: PlayerTypes;
   winner: undefined | PlayerTypes;
 }
-// The events that the machine handles
 
+// The events that the machine handles
 export type TicTacToeState =
   | {
       value: 'playing';
@@ -73,7 +73,7 @@ function checkDraw(ctx: TicTacToeContext) {
   return ctx.moves === 9;
 }
 
-const PLAY = 'PLAY';
+export const PLAY = 'PLAY';
 
 type PlayValues = {
   value: number;
@@ -95,9 +95,22 @@ const isValidMove = (ctx: TicTacToeContext, e: PlayUpdateEvent) => {
   return ctx.board[e.input.value] === null;
 };
 
-type ResetEvent = { type: 'RESET' };
+export const RESET = 'RESET';
 
-export type TicTacToeEvent = PlayUpdateEvent | ResetEvent;
+type ResetUpdateEvent = ImmerUpdateEvent<typeof RESET>;
+
+const resetUpdater = createUpdater<TicTacToeContext, ResetUpdateEvent>(
+  RESET,
+  (ctx) => {
+    // wish there was a way to do this without enumerating properties
+    ctx.board = initialContext.board;
+    ctx.moves = initialContext.moves;
+    ctx.player = initialContext.player;
+    ctx.winner = initialContext.winner;
+  }
+);
+
+export type TicTacToeEvent = PlayUpdateEvent | ResetUpdateEvent;
 
 export const ticTacToeMachine = createMachine<
   TicTacToeContext,
@@ -129,9 +142,9 @@ export const ticTacToeMachine = createMachine<
       draw: {},
     },
     on: {
-      RESET: {
+      [resetUpdater.type]: {
         target: 'playing',
-        actions: 'resetGame',
+        actions: resetUpdater.action,
       },
     },
   },
