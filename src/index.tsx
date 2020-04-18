@@ -1,5 +1,5 @@
 /** @jsx createElement */
-import { createElement, Context, Children } from '@bikeshaving/crank';
+import { createElement, Context } from '@bikeshaving/crank';
 import { renderer } from '@bikeshaving/crank/dom';
 import {
   ticTacToeMachine,
@@ -27,20 +27,11 @@ function Tile(
   return <div {...props} />;
 }
 
-function Button(
-  this: Context,
-  { onClick, children }: { onClick: () => void; children: Children }
-) {
-  this.addEventListener('click', (_) => {
-    onClick();
-  });
-  return <button>{children}</button>;
-}
-
 function getTitle(
   currentState: State<TicTacToeContext, TicTacToeEvent, any, TicTacToeState>,
   send: EventReturn<TicTacToeEvent>
 ) {
+  const handleReset = () => send({ type: 'RESET' });
   if (currentState.matches('playing')) {
     return (
       <h2>Player {currentState.context.player.toString().toUpperCase()}</h2>
@@ -51,14 +42,14 @@ function getTitle(
     return (
       <h2>
         Player {currentState.context.winner?.toString().toUpperCase()} wins!{' '}
-        <Button onClick={() => send({ type: 'RESET' })}>Reset</Button>
+        <button onclick={handleReset}>Reset</button>
       </h2>
     );
   }
 
   return (
     <h2>
-      Draw <Button onClick={() => send({ type: 'RESET' })}>Reset</Button>
+      Draw <button onclick={handleReset}>Reset</button>
     </h2>
   );
 }
@@ -78,7 +69,6 @@ async function* TicTacToe() {
   let nextEvent = null;
   let state = machine.initialState;
 
-  console.log('state', state);
   do {
     const { send, hasNextEvent } = useNextEvent();
 

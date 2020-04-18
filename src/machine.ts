@@ -1,5 +1,5 @@
-import { actions, createMachine } from 'xstate';
-const { assign } = actions;
+import { createMachine } from 'xstate';
+import { assign, createUpdater, ImmerUpdateEvent } from '@xstate/immer';
 
 enum PlayerTypes {
   'x' = 'x',
@@ -14,9 +14,6 @@ export interface TicTacToeContext {
   winner: undefined | PlayerTypes;
 }
 // The events that the machine handles
-export type TicTacToeEvent =
-  | { type: 'PLAY'; value: number; player: PlayerTypes }
-  | { type: 'RESET' };
 
 export type TicTacToeState =
   | {
@@ -39,8 +36,10 @@ const initialContext = {
   winner: undefined,
 };
 
-const isValidMove = (ctx: TicTacToeContext, e: TicTacToeEvent) => {
-  return e.type === 'PLAY' ? ctx.board[e.value] === null : false;
+const isValidMove = (ctx: TicTacToeContext, e: PlayUpdateEvent) => {
+  console.log('e', e);
+  return true;
+  return ctx.board[e.value] === null;
 };
 
 function checkWin(ctx: TicTacToeContext) {
@@ -80,6 +79,29 @@ function checkDraw(ctx: TicTacToeContext) {
   return ctx.moves === 9;
 }
 
+const PlayType = 'PLAY';
+type PlayValues = {
+  value: number;
+  player: PlayerTypes;
+};
+
+type PlayUpdateEvent = ImmerUpdateEvent<typeof PlayType, PlayValues>;
+const playUpdater = createUpdater<TicTacToeContext, PlayUpdateEvent>(
+  PlayType,
+  (ctx, { input }) => {
+    console.log('ctx', ctx);
+    console.log('input', input);
+
+    // ctx.board[input.value] = ctx.player;
+    // ctx.moves = ctx.moves + 1;
+    // ctx.player = ctx.player === PlayerTypes.x ? PlayerTypes.o : PlayerTypes.x;
+  }
+);
+
+type ResetEvent = { type: 'RESET' };
+
+type TicTacToeEvent = PlayUpdateEvent | ResetEvent;
+
 export const ticTacToeMachine = createMachine<
   TicTacToeContext,
   TicTacToeEvent,
@@ -95,11 +117,11 @@ export const ticTacToeMachine = createMachine<
             { target: 'winner', cond: 'checkWin' },
             { target: 'draw', cond: 'checkDraw' },
           ],
-          PLAY: [
+          [playUpdater.type]: [
             {
               target: 'playing',
-              cond: 'isValidMove',
-              actions: 'updateBoard',
+              cond: isValidMove,
+              actions: playUpdater.action,
             },
           ],
         },
@@ -118,29 +140,14 @@ export const ticTacToeMachine = createMachine<
   },
   {
     actions: {
-      updateBoard: assign({
-        board: (ctx, e) => {
-          if (e.type === 'PLAY') {
-            const updatedBoard = [...ctx.board];
-            updatedBoard[e.value] = ctx.player;
-            return updatedBoard;
-          }
-          return [...ctx.board];
-        },
-        moves: (ctx) => ctx.moves + 1,
-        player: (ctx) =>
-          ctx.player === PlayerTypes.x ? PlayerTypes.o : PlayerTypes.x,
-      }),
-      resetGame: () => assign(initialContext),
-      setWinner: assign({
-        winner: (ctx) =>
-          ctx.player === PlayerTypes.x ? PlayerTypes.o : PlayerTypes.x,
+      setWinner: assign<TicTacToeContext>((context) => {
+        context.winner =
+          context.player === PlayerTypes.x ? PlayerTypes.o : PlayerTypes.x;
       }),
     },
     guards: {
       checkWin,
       checkDraw,
-      isValidMove,
     },
   }
 );
