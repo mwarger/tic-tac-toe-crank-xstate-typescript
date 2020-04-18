@@ -81,8 +81,7 @@ async function* TicTacToe() {
               onClick={() => {
                 send({
                   type: 'PLAY',
-                  player: state.context.player,
-                  value: i,
+                  input: { player: state.context.player, value: i },
                 });
               }}
               className={styles.tile}
